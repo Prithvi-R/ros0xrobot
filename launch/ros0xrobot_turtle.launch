@@ -1,11 +1,17 @@
 <launch>
-  <node name="ros0xrobot" pkg="ros0xrobot" type="ros0xrobotNode" output="screen">
-     <param name="port" value="/dev/ttyUSB0" />
-     <param name="enableSonar" value="true" />
-     <param name="CountsPerRev" value="3840" />
-     <param name="WheelDiameter" value="100.0" />
-     <param name="AxelLength" value="299.0" />
-   </node>
-   
-   <node name="turtle_wanderer" pkg="ros0xrobot" type="wanderer.py" output="screen" />
+  <arg name="robot_name" default="robot2"/>
+  <arg name="robot_port" default="/dev/ttyUSB1"/>
+  
+  <group ns="$(arg robot_name)">
+    <node name="ros0xrobot" pkg="ros0xrobot" type="ros0xrobotNode" output="screen">
+      <param name="port" value="$(arg robot_port)" />
+      <param name="enableSonar" value="true" />
+      <param name="enableImu" value="true" />
+      <param name="CountsPerRev" value="3840" />
+      <param name="WheelDiameter" value="100.0" />
+      <param name="AxelLength" value="299.0" />
+    </node>
+
+    <node name="turtle_wanderer" pkg="ros0xrobot" type="wanderer.py" output="screen" />
+  </group>
 </launch>

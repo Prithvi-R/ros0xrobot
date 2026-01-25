@@ -1,8 +1,11 @@
 <launch>
+<arg name="robot_name" default="robot1"/>
+    <group ns="$(arg robot_name)">
+        <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleopFirebird" output=">
+            <remap from="cmd_vel" to="ros0xrobot/cmd_vel"/>
+            <param name="repeat_rate" value="10.0" />
+            <param name="key_timeout" value="0.5" />
+        </node>
 
-<node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleopFirebird" output="screen" >
-    <remap from="cmd_vel" to="ros0xrobot/cmd_vel"/>
-</node>
-
-
+    </group>
 </launch>

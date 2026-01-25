@@ -1,0 +1,36 @@
+<launch>
+  <arg name="lidar_port" default="/dev/ttyUSB0"/>
+
+  <group ns="$(arg robot_name)">
+    <node name="ros0xrobot" pkg="ros0xrobot" type="ros0xrobotNode" output="screen">
+      <param name="port" value="$(arg robot_port)" />
+      <param name="CountsPerRev" value="3840" />
+      <param name="WheelDiameter" value="100.0" />
+      <param name="axelLength" value="290.0" />
+      <param name="enableImu" value="true" />
+      <param name="enableSonar" value="true" />
+    </node>
+
+    <node name="rplidarNode" pkg="rplidar_ros" type="rplidarNode" output="screen">
+      <param name="serial_port" value="$(arg lidar_port)"/>
+      <param name="serial_baudrate" value="115200"/>
+      <param name="frame_id" value="laser"/>
+  <param name="inverted"            type="bool"   value="false"/>
+  <param name="angle_compensate"    type="bool"   value="true"/>
+    </node>
+
+    <node name="nmea_navsat_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver">
+      <param name="port" value="$(arg robot_port)" />
+      <param name="baud" value="9600" />
+    </node>
+
+    <node pkg="tf" type="static_transform_publisher" name="Laser_broadcaster"
+          args="0.1 0 0.1 0 0 0 $(arg robot_name)/base_link laser 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="imu_broadcaster"
+          args="0 0 0.1 0 0 0 $(arg robot_name)/base_link $(arg robot_name)/imu_frame 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="gps_broadcaster"
+          args="0 0.1 0.1 0 0 0 $(arg robot_name)/base_link $(arg robot_name)/gps 100" />
+  </group>
+</launch>
