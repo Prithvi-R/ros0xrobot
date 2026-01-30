@@ -1,8 +1,14 @@
 <launch>
-  <arg name="lidar_port" default="/dev/ttyUSB0"/>
+  <arg name="robot_name" default="robot1"/>
+  <arg name="robot_port" default="/dev/ttyUSB0"/>
+  <arg name="lidar_port" default="/dev/ttyUSB1"/>
 
   <group ns="$(arg robot_name)">
+
     <node name="ros0xrobot" pkg="ros0xrobot" type="ros0xrobotNode" output="screen">
+      <param name="tf_prefix" value="$(arg robot_name)" />
+      <param name="base_frame_id" value="$(arg robot_name)/base_link" />
+      <param name="odom_frame_id" value="$(arg robot_name)/odom" />
       <param name="port" value="$(arg robot_port)" />
       <param name="CountsPerRev" value="3840" />
       <param name="WheelDiameter" value="100.0" />
@@ -14,23 +20,23 @@
     <node name="rplidarNode" pkg="rplidar_ros" type="rplidarNode" output="screen">
       <param name="serial_port" value="$(arg lidar_port)"/>
       <param name="serial_baudrate" value="115200"/>
-      <param name="frame_id" value="laser"/>
-  <param name="inverted"            type="bool"   value="false"/>
-  <param name="angle_compensate"    type="bool"   value="true"/>
+      <param name="frame_id" value="$(arg robot_name)/laser"/>
+      <param name="inverted" type="bool" value="false"/>
+      <param name="angle_compensate" type="bool" value="true"/>
     </node>
 
-    <node name="nmea_navsat_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver">
-      <param name="port" value="$(arg robot_port)" />
-      <param name="baud" value="9600" />
-    </node>
 
-    <node pkg="tf" type="static_transform_publisher" name="Laser_broadcaster"
-          args="0.1 0 0.1 0 0 0 $(arg robot_name)/base_link laser 100" />
+    <node pkg="tf" type="static_transform_publisher" name="odom_to_base_bridge"
+          args="0 0 0 0 0 0 $(arg robot_name)/odom $(arg robot_name)/base_footprint 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="laser_broadcaster"
+          args="0.1 0 0.1 0 0 0 $(arg robot_name)/base_link $(arg robot_name)/laser 100" />
 
     <node pkg="tf" type="static_transform_publisher" name="imu_broadcaster"
           args="0 0 0.1 0 0 0 $(arg robot_name)/base_link $(arg robot_name)/imu_frame 100" />
 
     <node pkg="tf" type="static_transform_publisher" name="gps_broadcaster"
           args="0 0.1 0.1 0 0 0 $(arg robot_name)/base_link $(arg robot_name)/gps 100" />
+
   </group>
 </launch>
